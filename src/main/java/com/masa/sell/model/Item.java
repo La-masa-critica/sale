@@ -1,15 +1,11 @@
 package com.masa.sell.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.*;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 @NoArgsConstructor
@@ -17,17 +13,18 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Item {
+public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     //private String description;
-    private Double price;
+    @Column(name="price", precision=10, scale=2)
+    private BigDecimal price;
     private Integer stock;
     //private String image;
-    private Boolean available;
+    private Boolean enabled;
 
     @JsonIgnore
     @ManyToMany
@@ -36,5 +33,5 @@ public class Item {
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> productCategoryList;
+    private List<Category> CategoryList;
 }

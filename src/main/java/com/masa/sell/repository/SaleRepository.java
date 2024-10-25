@@ -9,7 +9,5 @@ import java.util.List;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Sale> findByProfileId(Long profileId);
-    List<Sale> findByProfileIdAndEnabled(Long profileId, Boolean enabled);
     void deleteByProfileId(Long profileId);
-    void deleteByProfileIdAndEnabled(Long profileId, Boolean enabled);
 }

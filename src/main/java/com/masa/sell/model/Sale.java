@@ -25,6 +25,6 @@ public class Sale{
     private BigDecimal total;
     private String comments;
 
-    @OneToMany(mappedBy = "Sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SaleDetails> saleDetails = new HashSet<>();
 }

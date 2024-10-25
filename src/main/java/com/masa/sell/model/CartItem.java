@@ -1,13 +1,7 @@
 package com.masa.sell.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.proxy.HibernateProxy;
-
-import java.util.Objects;
+import lombok.*;
 
 
 @Entity(name = "cart_item")
@@ -15,6 +9,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CartItem{
     @EmbeddedId
     private CartItemId id = new CartItemId();
@@ -24,6 +19,7 @@ public class CartItem{
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+    @Column(name = "item_id", insertable = false, updatable = false)
     private Long itemId;
 
     private Integer quantity;

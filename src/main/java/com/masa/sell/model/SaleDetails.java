@@ -15,9 +15,15 @@ import lombok.NoArgsConstructor;
 public class SaleDetails {
     @Id
     private Long id;
+
+    @Column(name = "sale_id", insertable = false, updatable = false)
     private Long saleId;
+
+    @Column(name = "item_id", insertable = false, updatable = false)
     private Long itemId;
+
     private Integer quantity;
+
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 

@@ -1,10 +1,9 @@
 package com.masa.sell.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -13,8 +12,11 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CartItemId implements Serializable {
+    @Column(name = "cart_id")
     private Long cartId;
+    @Column(name = "item_id")
     private Long itemId;
 
     @Override
