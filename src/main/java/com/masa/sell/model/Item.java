@@ -32,8 +32,8 @@ public class Item {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-            name = "product_category",
-            joinColumns = @JoinColumn(name = "product_id"),
+            name = "item_category",
+            joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> productCategoryList;

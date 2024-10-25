@@ -1,6 +1,7 @@
 package com.masa.sell.model;
 
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,33 +12,15 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CartItemId implements Serializable {
     private Long cartId;
     private Long itemId;
 
-    public CartItemId(Long cartId, Long itemId) {
-        this.cartId = cartId;
-        this.itemId = itemId;
-    }
-
-    public CartItemId() {
-        this.cartId = 0L;
-        this.itemId = 0L;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public Long getItemId() {
-        return itemId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CartItemId)) return false;
-        CartItemId that = (CartItemId) o;
+        if (!(o instanceof CartItemId that)) return false;
         return Objects.equals(getCartId(), that.getCartId()) &&
                 Objects.equals(getItemId(), that.getItemId());
     }
