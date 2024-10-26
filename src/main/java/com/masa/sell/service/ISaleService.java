@@ -6,8 +6,8 @@ import com.masa.sell.model.Sale;
 import java.util.Optional;
 
 public interface ISaleService {
-    Optional<Sale> createSale(Cart cart);
+    Optional<Sale> createSale(Long cartId);
     Optional<Sale> getSale(Long saleId);
-    Optional<Sale> updateSale(Sale sale);
+    Optional<Sale> updateSale(Long saleId);
     String getSaleStatus(Long saleId);
 }

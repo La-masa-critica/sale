@@ -7,14 +7,15 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
-
-@Entity(name = "sale")
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "sale")
+@Accessors(chain = true)
 public class Sale{
     @Id
     private Long id;

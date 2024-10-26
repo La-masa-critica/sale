@@ -4,14 +4,13 @@ import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity(name = "sale_details")
-@AllArgsConstructor
+@Data
+@Builder
 @NoArgsConstructor
-@Getter
+@AllArgsConstructor
+@Entity(name = "sale_details")
 public class SaleDetails {
     @Id
     private Long id;

@@ -4,10 +4,11 @@ import com.masa.sell.model.SaleDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface SaleDetailsRepository extends JpaRepository<SaleDetails, Long> {
-    List<SaleDetails> findBySaleId(Long saleId);
+    Set<SaleDetails> findBySaleId(Long saleId);
+    void saveAll(Set<SaleDetails> saleDetails);
     void deleteBySaleId(Long saleId);
 }
