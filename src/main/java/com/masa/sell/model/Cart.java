@@ -16,10 +16,14 @@ import lombok.*;
 public class Cart{
     @Id
     private Long id;
-    private Long profileId;
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "cart",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
     private Set<CartItem> cartItems = new HashSet<>();
 
 }

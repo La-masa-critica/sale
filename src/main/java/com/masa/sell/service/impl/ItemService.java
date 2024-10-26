@@ -6,6 +6,7 @@ import com.masa.sell.service.IItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,6 +37,11 @@ public class ItemService implements IItemService {
     @Override
     public Boolean existsById(Long itemId) {
         return itemRepository.findById(itemId).isPresent();
+    }
+
+    @Override
+    public List<Item> getItems() {
+        return itemRepository.findByEnabledTrue();
     }
 
     @Autowired
