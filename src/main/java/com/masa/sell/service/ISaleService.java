@@ -9,5 +9,4 @@ public interface ISaleService {
     Optional<Sale> createSale(Long cartId);
     Optional<Sale> getSale(Long saleId);
     Optional<Sale> updateSale(Long saleId);
-    String getSaleStatus(Long saleId);
 }

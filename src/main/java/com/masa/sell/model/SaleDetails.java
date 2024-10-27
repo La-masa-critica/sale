@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,9 +31,4 @@ public class SaleDetails {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sale_id", insertable = false, updatable = false)
     private Sale sale;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", insertable = false, updatable = false)
-    private Item item;
 }

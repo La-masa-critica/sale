@@ -1,5 +1,7 @@
 package com.masa.sell.service.impl;
 
+import com.masa.sell.DTO.ItemDTO;
+import com.masa.sell.client.ItemClient;
 import com.masa.sell.model.*;
 import com.masa.sell.repository.SaleDetailsRepository;
 import com.masa.sell.repository.SaleRepository;
@@ -18,8 +20,8 @@ import java.util.stream.Collectors;
 public class SaleService implements ISaleService {
     private SaleRepository saleRepository;
     private CartService cartService;
-    private ItemService itemService;
     private SaleDetailsRepository saleDetailsRepository;
+    private ItemService itemService;
 
     @Transactional
     @Override
@@ -51,7 +53,7 @@ public class SaleService implements ISaleService {
                 .map(item -> SaleDetails.builder()
                         .itemId(item.getItemId())
                         .quantity(item.getQuantity())
-                        .price(itemService.getItem(item.getItemId()).map(Item::getPrice).orElse(BigDecimal.ZERO))
+                        .price(itemService.getItem(item.getItemId()).map(ItemDTO::getPrice).orElse(BigDecimal.ZERO))
                         .saleId(saleId)
                         .build())
                 .map(saleDetailsRepository::save)
@@ -68,11 +70,6 @@ public class SaleService implements ISaleService {
         return Optional.empty();
     }
 
-    @Override
-    public String getSaleStatus(Long saleId) {
-        return "";
-    }
-
     @Autowired
     public void setSaleRepository(SaleRepository saleRepository) {
         this.saleRepository = saleRepository;
@@ -84,12 +81,12 @@ public class SaleService implements ISaleService {
     }
 
     @Autowired
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
+    public void setSaleDetailsRepository(SaleDetailsRepository saleDetailsRepository) {
+        this.saleDetailsRepository = saleDetailsRepository;
     }
 
     @Autowired
-    public void setSaleDetailsRepository(SaleDetailsRepository saleDetailsRepository) {
-        this.saleDetailsRepository = saleDetailsRepository;
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
     }
 }
