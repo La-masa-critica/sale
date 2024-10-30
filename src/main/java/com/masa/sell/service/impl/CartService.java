@@ -31,8 +31,13 @@ public class CartService implements ICartService {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
+        if (!itemService.itemExists(itemId)) {
+            throw new IllegalArgumentException("Item does not exist");
+        }
+        System.out.println("Item exists");
+        System.out.println("item id: " + itemId);
         if (!itemService.updateItem(itemId, -quantity)) {
-            throw new IllegalArgumentException("Item does not exist or quantity is not enough");
+            throw new IllegalArgumentException("Quantity is not enough");
         }
 
         Cart cart = getCart(profileId).orElseGet(() -> createNewCart(profileId));

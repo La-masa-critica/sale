@@ -12,6 +12,7 @@ import lombok.*;
 @Setter
 @Builder
 public class CartItem{
+    @Builder.Default
     @EmbeddedId
     private CartItemId id = new CartItemId();
 

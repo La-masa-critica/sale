@@ -2,7 +2,7 @@ spring:
   application:
     name: sell-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydatabase
+    url: jdbc:postgresql://postgres:5432/mydatabase
     username: myuser
     password: mypassword
     driver-class-name: org.postgresql.Driver
@@ -30,7 +30,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
 

@@ -4,6 +4,7 @@ import com.masa.sell.DTO.ItemDTO;
 import com.masa.sell.client.ItemClient;
 import com.masa.sell.service.IItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class ItemService implements IItemService {
     }
 
     @Autowired
-    public void setItemClient(ItemClient itemClient) {
+    public void setItemClient(@Qualifier("com.masa.sell.client.ItemClient") ItemClient itemClient) {
         this.itemClient = itemClient;
     }
 

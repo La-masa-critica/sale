@@ -9,6 +9,5 @@ import java.util.Set;
 @Repository
 public interface SaleDetailsRepository extends JpaRepository<SaleDetails, Long> {
     Set<SaleDetails> findBySaleId(Long saleId);
-    void saveAll(Set<SaleDetails> saleDetails);
     void deleteBySaleId(Long saleId);
 }
