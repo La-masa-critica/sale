@@ -5,7 +5,7 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM localhost/jre-spring:latest as final
+FROM ghcr.io/la-masa-critica/jre-spring:main AS final
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8081
