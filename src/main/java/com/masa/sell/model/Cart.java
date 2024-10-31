@@ -18,6 +18,7 @@ public class Cart{
     private Long id;
     private Boolean enabled;
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "cart",
             cascade = CascadeType.ALL,

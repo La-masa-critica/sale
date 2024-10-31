@@ -4,6 +4,7 @@ import com.masa.sell.DTO.CartDTO;
 import com.masa.sell.DTO.CartItemDTO;
 import com.masa.sell.mapper.CartMapper;
 import com.masa.sell.service.ICartService;
+import com.masa.sell.service.impl.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,12 @@ public class CartController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> clearCart(@RequestParam Long profileId) {
+        cartService.clearCart(profileId);
+        return ResponseEntity.ok().build();
+    }
+
     @Autowired
     public void setCartService(ICartService cartService) {
         this.cartService = cartService;
@@ -40,4 +47,5 @@ public class CartController {
     public void setCartMapper(CartMapper cartMapper) {
         this.cartMapper = cartMapper;
     }
+
 }

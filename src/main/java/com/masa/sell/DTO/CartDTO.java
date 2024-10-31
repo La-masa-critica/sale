@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class CartDTO {
     private Long id;
-    private Boolean enabled;;
+    private Boolean enabled;
     private Set<CartItemDTO> items;
 
 }

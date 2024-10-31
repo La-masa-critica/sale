@@ -7,16 +7,18 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
-
-@Entity(name = "sale")
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity(name = "sale")
+@Accessors(chain = true)
 public class Sale{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long profileId;
     private Timestamp date;
@@ -25,6 +27,7 @@ public class Sale{
     private BigDecimal total;
     private String comments;
 
+    @Builder.Default
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SaleDetails> saleDetails = new HashSet<>();
 }
