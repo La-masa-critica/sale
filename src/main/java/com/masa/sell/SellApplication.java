@@ -7,12 +7,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @SpringBootApplication
 @EnableJpaRepositories
 @EnableFeignClients
 @EnableDiscoveryClient
-@CrossOrigin(origins = "*")
 public class SellApplication {
 
 	public static void main(String[] args) {
