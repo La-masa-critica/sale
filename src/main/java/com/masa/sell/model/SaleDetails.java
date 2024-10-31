@@ -14,12 +14,10 @@ import lombok.*;
 @Entity(name = "sale_details")
 public class SaleDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "sale_id", insertable = false, updatable = false)
-    private Long saleId;
-
-    @Column(name = "item_id", insertable = false, updatable = false)
+    @Column(name = "item_id", nullable = false)
     private Long itemId;
 
     private Integer quantity;
@@ -29,6 +27,6 @@ public class SaleDetails {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sale_id", insertable = false, updatable = false)
+    @JoinColumn(name = "sale_id", nullable = false)
     private Sale sale;
 }

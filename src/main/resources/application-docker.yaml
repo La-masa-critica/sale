@@ -34,5 +34,12 @@ eureka:
   instance:
     prefer-ip-address: true
 
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        type: trace
+
 server:
   port: 8081

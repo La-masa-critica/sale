@@ -3,6 +3,7 @@ package com.masa.sell.service.impl;
 import com.masa.sell.DTO.ItemDTO;
 import com.masa.sell.client.ItemClient;
 import com.masa.sell.model.*;
+import com.masa.sell.repository.CartItemRepository;
 import com.masa.sell.repository.SaleDetailsRepository;
 import com.masa.sell.repository.SaleRepository;
 import com.masa.sell.service.ISaleService;
@@ -22,15 +23,22 @@ public class SaleService implements ISaleService {
     private CartService cartService;
     private SaleDetailsRepository saleDetailsRepository;
     private ItemService itemService;
+    private final CartItemRepository cartItemRepository;
+
+    public SaleService(CartItemRepository cartItemRepository) {
+        this.cartItemRepository = cartItemRepository;
+    }
 
     @Transactional
     @Override
     public Optional<Sale> createSale(Long cartId) {
         Cart cart = cartService.getCart(cartId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
-        Sale sale = newSale(cartId);
-        Set<SaleDetails> saleDetails = createSaleDetails(sale.getId(), cart.getCartItems());
+        Sale sale = saleRepository.save(newSale(cartId));
+        // Add a log in the console with the sale ID
+        Set<SaleDetails> saleDetails = createSaleDetails(sale, cart.getCartItems());
         BigDecimal total = calculateTotal(saleDetails);
-        return Optional.of(saleRepository.save(sale.setTotal(total).setSaleDetails(saleDetails)));
+        sale.setTotal(total).setSaleDetails(saleDetails);
+        return Optional.of(saleRepository.save(sale));
     }
 
     private Sale newSale(Long cartId) {
@@ -48,13 +56,13 @@ public class SaleService implements ISaleService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Set<SaleDetails> createSaleDetails(Long saleId, Set<CartItem> cartItems) {
+    private Set<SaleDetails> createSaleDetails(Sale sale, Set<CartItem> cartItems) {
         return cartItems.stream()
                 .map(item -> SaleDetails.builder()
                         .itemId(item.getItemId())
+                        .sale(sale)
                         .quantity(item.getQuantity())
                         .price(itemService.getItem(item.getItemId()).map(ItemDTO::getPrice).orElse(BigDecimal.ZERO))
-                        .saleId(saleId)
                         .build())
                 .map(saleDetailsRepository::save)
                 .collect(Collectors.toSet());
@@ -62,14 +70,35 @@ public class SaleService implements ISaleService {
 
     @Override
     public Optional<Sale> getSale(Long saleId) {
-        return Optional.empty();
+        return saleRepository.findById(saleId);
+    }
+
+    private Optional<Sale> updateSale(Long saleId, String status) {
+        if (!saleRepository.existsById(saleId) || (!status.equals("PAID") && !status.equals("CANCELLED"))) {
+            return Optional.empty();
+        }
+        return getSale(saleId)
+                .map(sale -> {
+                    sale.setStatus(status);
+                    return saleRepository.save(sale);
+                });
     }
 
     @Override
-    public Optional<Sale> updateSale(Long saleId) {
-        return Optional.empty();
+    public Boolean cancelSale(Long saleId) {
+        Sale sale = getSale(saleId).orElseThrow(() -> new IllegalArgumentException("Sale does not exist"));
+        Cart cart = cartService.getCart(sale.getProfileId()).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
+        cart.getCartItems().forEach(cartItem -> itemService.updateItem(cartItem.getItemId(), cartItem.getQuantity()));
+        return updateSale(saleId, "CANCELLED").isPresent();
     }
 
+    @Override
+    public Optional<Sale> confirmSale(Long saleId) {
+        Sale sale = getSale(saleId).orElseThrow(() -> new IllegalArgumentException("Sale does not exist"));
+        Cart cart = cartService.getCart(sale.getProfileId()).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
+        cartItemRepository.deleteAll(cart.getCartItems());
+        return updateSale(saleId, "CONFIRMED");
+    }
     @Autowired
     public void setSaleRepository(SaleRepository saleRepository) {
         this.saleRepository = saleRepository;
