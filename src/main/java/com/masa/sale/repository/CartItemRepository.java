@@ -1,7 +1,7 @@
-package com.masa.sell.repository;
+package com.masa.sale.repository;
 
-import com.masa.sell.model.CartItem;
-import com.masa.sell.model.CartItemId;
+import com.masa.sale.model.CartItem;
+import com.masa.sale.model.CartItemId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
-package com.masa.sell.repository;
+package com.masa.sale.repository;
 
-import com.masa.sell.model.Sale;
+import com.masa.sale.model.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,10 +1,10 @@
-package com.masa.sell;
+package com.masa.sale;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SellApplicationTests {
+class SaleApplicationTests {
 
 	@Test
 	void contextLoads() {

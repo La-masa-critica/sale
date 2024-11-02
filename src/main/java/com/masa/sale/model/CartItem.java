@@ -1,8 +1,9 @@
-package com.masa.sell.model;
+package com.masa.sale.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 
 @Entity(name = "cart_item")
@@ -11,6 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@Accessors(chain = true)
 public class CartItem{
     @Builder.Default
     @EmbeddedId

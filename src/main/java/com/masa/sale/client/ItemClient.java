@@ -1,7 +1,7 @@
-package com.masa.sell.client;
+package com.masa.sale.client;
 
-import com.masa.sell.DTO.ItemDTO;
-import com.masa.sell.fallback.ItemDTOFallback;
+import com.masa.sale.dto.ItemDTO;
+import com.masa.sale.fallback.ItemDTOFallback;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +22,12 @@ public interface ItemClient {
     @GetMapping("/{itemId}")
     ItemDTO getItem(@PathVariable Long itemId);
 
-    @PutMapping("/update")
-    Boolean updateItem(@RequestParam Long itemId, @RequestParam Integer quantity);
+    @PutMapping("/increment")
+    ItemDTO incrementStock(@RequestParam Long itemId, @RequestParam Integer quantity);
+
+    @PutMapping("/decrement")
+    ItemDTO decrementStock(@RequestParam Long itemId, @RequestParam Integer quantity);
+
+    @GetMapping("/exists/{itemId}")
+    Boolean existsById(@PathVariable Long itemId);
 }

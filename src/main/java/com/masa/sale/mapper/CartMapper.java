@@ -1,9 +1,9 @@
-package com.masa.sell.mapper;
+package com.masa.sale.mapper;
 
-import com.masa.sell.DTO.CartDTO;
-import com.masa.sell.DTO.CartItemDTO;
-import com.masa.sell.model.Cart;
-import com.masa.sell.model.CartItem;
+import com.masa.sale.dto.CartDTO;
+import com.masa.sale.dto.CartItemDTO;
+import com.masa.sale.model.Cart;
+import com.masa.sale.model.CartItem;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;

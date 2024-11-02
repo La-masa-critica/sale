@@ -1,4 +1,4 @@
-package com.masa.sell.model;
+package com.masa.sale.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,12 +22,13 @@ public class Sale{
     private Long id;
     private Long profileId;
     private LocalDateTime date;
+    @Enumerated(EnumType.STRING)
     private SaleStatus status;
     @Column(name = "total", precision = 10, scale = 2)
     private BigDecimal total;
     private String comments;
 
     @Builder.Default
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<SaleDetails> saleDetails = new HashSet<>();
 }

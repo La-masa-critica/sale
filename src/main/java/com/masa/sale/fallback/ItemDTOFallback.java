@@ -1,7 +1,7 @@
-package com.masa.sell.fallback;
+package com.masa.sale.fallback;
 
-import com.masa.sell.DTO.ItemDTO;
-import com.masa.sell.client.ItemClient;
+import com.masa.sale.dto.ItemDTO;
+import com.masa.sale.client.ItemClient;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -20,7 +20,17 @@ public class ItemDTOFallback implements ItemClient {
     }
 
     @Override
-    public Boolean updateItem(Long itemId, Integer quantity) {
+    public ItemDTO decrementStock(Long itemId, Integer quantity) {
+        return null;
+    }
+
+    @Override
+    public Boolean existsById(Long itemId) {
         return false;
+    }
+
+    @Override
+    public ItemDTO incrementStock(Long itemId, Integer quantity) {
+        return null;
     }
 }

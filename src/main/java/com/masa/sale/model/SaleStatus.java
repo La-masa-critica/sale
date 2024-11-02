@@ -1,4 +1,4 @@
-package com.masa.sell.model;
+package com.masa.sale.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum SaleStatus {
     PENDING("PENDING", "Sale is created but not processed"),
-    PROCESSING("PROCESSING", "Sale is being processed"),
+    //PROCESSING("PROCESSING", "Sale is being processed"),
     COMPLETED("COMPLETED", "Sale has been successfully completed"),
     CANCELLED("CANCELLED", "Sale was cancelled"),
     FAILED("FAILED", "Sale processing failed");
@@ -34,8 +34,9 @@ public enum SaleStatus {
         }
 
         return switch (this) {
-            case PENDING -> newStatus == PROCESSING || newStatus == CANCELLED;
-            case PROCESSING -> newStatus == COMPLETED || newStatus == FAILED;
+            case PENDING -> newStatus == COMPLETED || newStatus == CANCELLED; // --> Remove when the buy process is implemented.
+            //case PENDING -> newStatus == PROCESSING || newStatus == CANCELLED; // --> Add when the buy process is implemented.
+            //case PROCESSING -> newStatus == COMPLETED || newStatus == FAILED; // --> Add when the buy process is implemented.
             default -> false;
         };
     }

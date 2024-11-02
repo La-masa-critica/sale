@@ -1,4 +1,4 @@
-package com.masa.sell.model;
+package com.masa.sale.model;
 
 import jakarta.persistence.*;
 

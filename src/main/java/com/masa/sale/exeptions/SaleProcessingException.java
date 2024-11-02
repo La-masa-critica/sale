@@ -1,4 +1,4 @@
-package com.masa.sell.exeptions;
+package com.masa.sale.exeptions;
 
 public class SaleProcessingException extends RuntimeException {
     public SaleProcessingException(String message) {

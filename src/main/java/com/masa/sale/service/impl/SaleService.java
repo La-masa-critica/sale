@@ -1,20 +1,20 @@
-package com.masa.sell.service.impl;
+package com.masa.sale.service.impl;
 
-import com.masa.sell.DTO.ItemDTO;
-import com.masa.sell.exeptions.InventoryException;
-import com.masa.sell.exeptions.ResourceNotFoundException;
-import com.masa.sell.exeptions.SaleProcessingException;
-import com.masa.sell.model.*;
-import com.masa.sell.repository.CartItemRepository;
-import com.masa.sell.repository.SaleDetailsRepository;
-import com.masa.sell.repository.SaleRepository;
-import com.masa.sell.service.ISaleService;
+import com.masa.sale.dto.ItemDTO;
+import com.masa.sale.exeptions.InventoryException;
+import com.masa.sale.exeptions.ResourceNotFoundException;
+import com.masa.sale.exeptions.SaleProcessingException;
+import com.masa.sale.model.*;
+import com.masa.sale.repository.SaleDetailsRepository;
+import com.masa.sale.repository.SaleRepository;
+import com.masa.sale.service.ISaleService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,18 +23,19 @@ import java.util.stream.Collectors;
 public class SaleService implements ISaleService {
     private SaleRepository saleRepository;
     private CartService cartService;
+    private CartItemService cartItemService;
     private SaleDetailsRepository saleDetailsRepository;
     private ItemService itemService;
-    private CartItemRepository cartItemRepository;
 
     @Transactional
     @Override
     public Optional<Sale> create(Long cartId) {
-        return cartService.findById(cartId)
+        return Optional.ofNullable(cartService.find(cartId))
                 .map(this::processCartToSale);
     }
 
-    private Sale processCartToSale(Cart cart) {
+    @Transactional
+    protected Sale processCartToSale(Cart cart) {
         return Optional.of(cart)
                 .map(this::initializeSale)
                 .map(saleRepository::save)
@@ -51,17 +52,26 @@ public class SaleService implements ISaleService {
                 .build();
     }
 
-    private Sale completeSale(Sale sale, Set<CartItem> items) {
+    @Transactional
+    protected Sale completeSale(Sale sale, Set<CartItem> items) {
         Set<SaleDetails> saleDetails = createSaleDetails(sale, items);
+        items.forEach(cartItem -> cartItemService.delete(cartItem)); // --> No está funcionando.
         return sale.toBuilder()
                 .total(calculateTotal(saleDetails))
                 .saleDetails(saleDetails)
                 .build();
     }
 
+    private SaleDetails reserveItem(SaleDetails saleDetails) {
+        return itemService.decrementStock(saleDetails.getItemId(), saleDetails.getQuantity())
+                .map(item -> saleDetails)
+                .orElseThrow(() -> new InventoryException("Failed to reserve item: " + saleDetails.getItemId()));
+    }
+
     private Set<SaleDetails> createSaleDetails(Sale sale, Set<CartItem> items) {
         return items.stream()
                 .map(item -> createSaleDetail(sale, item))
+                .map(this::reserveItem)
                 .map(saleDetailsRepository::save)
                 .collect(Collectors.toUnmodifiableSet());
     }
@@ -91,64 +101,67 @@ public class SaleService implements ISaleService {
     }
 
     private Optional<Sale> transition(Sale sale, SaleStatus status) {
+        System.out.println("SaleService.transition");
+        if (!sale.getStatus().canTransitionTo(status)) {
+            System.out.println("Status can't transition to " + status);
+        }
         return Optional.of(sale)
                 .filter(s -> s.getStatus().canTransitionTo(status))
                 .map(s -> s.toBuilder().status(status).build())
                 .map(saleRepository::save);
     }
 
+    @Override
+    public List<Sale> findAllByProfileId(Long profileId) {
+        return saleRepository.findByProfileId(profileId);
+    }
+
     @Transactional
     @Override
     public Optional<Sale> cancel(Long id) {
-        return find(id)
-                .map(sale -> executeCancellation(sale, getCart(sale.getProfileId())));
+        Sale sale = find(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Sale not found with id: " + id));
+        return executeCancellation(sale);
+    }
+
+    private Optional<Sale> executeCancellation(Sale sale) {
+        transition(sale, SaleStatus.CANCELLED)
+                .orElseThrow(() -> new SaleProcessingException("Failed to cancel sale: " + sale.getId()));
+        restoreItems(sale);
+        return Optional.of(sale);
+    }
+
+    private void restoreItem(SaleDetails saleDetails) {
+        itemService.incrementStock(saleDetails.getItemId(), saleDetails.getQuantity())
+                .orElseThrow(() -> new InventoryException("Failed to restore item: " + saleDetails.getItemId()));
+    }
+
+    private void restoreItems(Sale sale) {
+        sale.getSaleDetails().forEach(this::restoreItem);
     }
 
     @Transactional
     @Override
-    public Optional<Sale> confirm(Long id) {
-        return find(id)
-                .map(sale -> executeConfirmation(sale, getCart(sale.getProfileId())));
+    public Optional<Sale> confirm(Long saleId) {
+        System.out.println("SaleService.confirm");
+        Sale sale = find(saleId).orElseThrow(() -> new RuntimeException("Sale not found with id: " + saleId));
+        return Optional.of(executeConfirmation(sale));
     }
 
-    private Cart getCart(Long profileId) {
-        return cartService.findById(profileId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart not found: " + profileId));
-    }
-
-    private Sale executeCancellation(Sale sale, Cart cart) {
-        restoreItems(cart.getCartItems());
-        return transition(sale, SaleStatus.CANCELLED)
-                .orElseThrow(() -> new SaleProcessingException("Failed to cancel sale: " + sale.getId()));
-    }
-
-    private Sale executeConfirmation(Sale sale, Cart cart) {
-        removeCartItems(cart);
+    private Sale executeConfirmation(Sale sale) {
+        System.out.println("SaleService.executeConfirmation");
         return transition(sale, SaleStatus.COMPLETED)
                 .orElseThrow(() -> new SaleProcessingException("Failed to confirm sale: " + sale.getId()));
     }
 
-    private void restoreItems(Set<CartItem> items) {
-        items.forEach(item ->
-                itemService.incrementStock(item.getItemId(), item.getQuantity())
-                        .orElseThrow(() -> new InventoryException("Failed to restore item: " + item.getItemId()))
-        );
-    }
-
-    private void removeCartItems(Cart cart) {
-        Optional.of(cart)
-                .map(Cart::getCartItems)
-                .ifPresent(cartItemRepository::deleteAll);
+    @Autowired
+    public void setCartItemService(CartItemService cartItemService) {
+        this.cartItemService = cartItemService;
     }
 
     @Autowired
     public void setSaleRepository(SaleRepository saleRepository) {
         this.saleRepository = saleRepository;
-    }
-
-    @Autowired
-    public void setCartItemRepository(CartItemRepository cartItemRepository) {
-        this.cartItemRepository = cartItemRepository;
     }
 
     @Autowired

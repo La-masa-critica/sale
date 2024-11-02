@@ -1,71 +1,92 @@
-package com.masa.sell.service.impl;
+package com.masa.sale.service.impl;
 
-import com.masa.sell.DTO.CartItemDTO;
-import com.masa.sell.model.Cart;
-import com.masa.sell.model.CartItem;
-import com.masa.sell.model.CartItemId;
-import com.masa.sell.repository.CartItemRepository;
-import com.masa.sell.repository.CartRepository;
-import com.masa.sell.service.ICartService;
+import com.masa.sale.dto.CartItemDTO;
+import com.masa.sale.exeptions.InventoryException;
+import com.masa.sale.model.Cart;
+import com.masa.sale.model.CartItem;
+import com.masa.sale.repository.CartRepository;
+import com.masa.sale.service.ICartService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CartService implements ICartService {
     private CartRepository cartRepository;
-    private CartItemRepository cartItemRepository;
+    private CartItemService cartItemService;
     private ItemService itemService;
 
     @Override
     @Transactional
-    public Optional<CartItem> addCartItem(CartItemDTO cartItem) {
-        if (!profileExists(cartItem.getCartId())) {
-            throw new IllegalArgumentException("Profile does not exist");
-        }
-        Long profileId = cartItem.getCartId();
-        Long itemId = cartItem.getItemId();
-        Integer quantity = cartItem.getQuantity();
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than 0");
-        }
-        if (!itemService.itemExists(itemId)) {
-            throw new IllegalArgumentException("Item does not exist");
-        }
-        System.out.println("Item exists");
-        System.out.println("item id: " + itemId);
-        if (!itemService.updateItem(itemId, -quantity)) {
-            throw new IllegalArgumentException("Quantity is not enough");
-        }
+    public Optional<CartItem> addCartItem(CartItemDTO cartItemDTO) {
+        validateCartItemDTO(cartItemDTO);
 
-        Cart cart = findById(profileId).orElseGet(() -> createNewCart(profileId));
-        return findCartItem(cart.getId(), itemId)
-                .map(cartItem1 -> {
-                    cartItem1.setQuantity(cartItem1.getQuantity() + quantity);
-                    return Optional.of(cartItemRepository.save(cartItem1));
-                })
-                .orElseGet(() -> Optional.of(createCartItem(cart, itemId, quantity)));
+        Long profileId = cartItemDTO.getCartId();
+        Long itemId = cartItemDTO.getItemId();
+        Integer quantity = cartItemDTO.getQuantity();
+        System.out.println("profileId: " + profileId);
+        System.out.println("itemId: " + itemId);
+        System.out.println("quantity: " + quantity);
+        Cart cart = cartExists(profileId) ? find(profileId) : createNewCart(profileId);
+
+        return cartItemService.exists(cart.getId(), itemId)
+                ? cartItemService.addQuantity(cart.getId(), itemId, quantity)
+                : Optional.of(cartItemService.createCartItem(cart, itemId, quantity));
     }
 
-    private CartItem createCartItem(Cart cart, Long itemId, Integer quantity) {
-        return cartItemRepository.save(
-                CartItem.builder()
-                        .id(CartItemId.builder()
-                                .cartId(cart.getId())
-                                .itemId(itemId)
-                                .build())
-                        .quantity(quantity)
-                        .cart(cart)
-                        .build()
-        );
+    @Transactional
+    @Override
+    public Optional<Cart> deleteCartItem(Long cartId, Long itemId) {
+        // TODO: Fix deleteCartItem method. Actually, it is not working.
+        cartItemService.delete(cartId, itemId);
+        return Optional.of(find(cartId));
     }
+
 
     @Override
     @Transactional
-    public Optional<Cart> findById(Long profileId) {
-        return cartRepository.findById(profileId);
+    public Cart find(Long profileId) {
+        return cartRepository.findById(profileId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found for profile: " + profileId));
+    }
+
+    @Transactional
+    public Set<CartItem> getCartItems(Long cartId){
+        return find(cartId).getCartItems();
+    }
+
+    @Override
+    public void restoreItems(Set<CartItem> items) {
+        items.forEach(item ->
+                itemService.incrementStock(item.getItemId(), item.getQuantity())
+                        .orElseThrow(() -> new InventoryException("Failed to restore item: " + item.getItemId()))
+        );
+    }
+
+    @Transactional
+    @Override
+    public void clearCart(Long cartId) {
+        cartItemService.findByCartId(cartId).forEach(cartItemService::delete);
+    }
+
+    @Override
+    public Boolean cartExists(Long profileId) {
+        return cartRepository.existsById(profileId);
+    }
+
+    private void validateCartItemDTO(CartItemDTO cartItemDTO) {
+        if (!profileExists(cartItemDTO.getCartId())) {
+            throw new IllegalArgumentException("Profile does not exist");
+        }
+        if (cartItemDTO.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        if (!itemService.itemExists(cartItemDTO.getItemId())) {
+            throw new IllegalArgumentException("Item does not exist");
+        }
     }
 
     private Cart createNewCart(Long profileId) {
@@ -82,64 +103,14 @@ public class CartService implements ICartService {
         return true;
     }
 
-
-    @Transactional
-    protected Optional<CartItem> findCartItem(Long cartId, Long itemId) {
-        return cartItemRepository.findById(CartItemId.builder()
-                .cartId(cartId)
-                .itemId(itemId)
-                .build());
-    }
-
-    @Override
-    @Transactional
-    public Optional<Cart> updateCartItem(Long profileId, Long itemId, Integer quantity) {
-        Cart cart = findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for profile: " + profileId));
-
-        CartItem cartItem = findCartItem(cart.getId(), itemId)
-                .orElseThrow(() -> new IllegalArgumentException("Item not in cart"));
-
-        int quantityDifference = quantity - cartItem.getQuantity();
-
-        if (!itemService.updateItem(itemId, -quantityDifference)) {
-            throw new IllegalArgumentException("Not enough stock available");
-        }
-
-        cartItem.setQuantity(quantity);
-        cartItemRepository.save(cartItem);
-        return Optional.of(cart);
-    }
-
-    @Transactional
-    @Override
-    public Optional<Cart> deleteCartItem(Long profileId, Long itemId) {
-        Cart cart = findById(profileId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
-        return findCartItem(cart.getId(), itemId)
-                .map(cartItem -> {
-                    itemService.updateItem(itemId, cartItem.getQuantity());
-                    cartItemRepository.delete(cartItem);
-                    return Optional.of(cart);
-                })
-                .orElse(Optional.empty());
-    }
-
-    @Transactional
-    @Override
-    public void clearCart(Long cartId) {
-        Cart cart = findById(cartId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
-        cart.getCartItems().forEach(cartItem -> itemService.updateItem(cartItem.getId().getItemId(), cartItem.getQuantity()));
-        cartItemRepository.deleteAll(cart.getCartItems());
-    }
-
     @Autowired
     public void setCartRepository(CartRepository cartRepository) {
         this.cartRepository = cartRepository;
     }
 
     @Autowired
-    public void setCartItemRepository(CartItemRepository cartItemRepository) {
-        this.cartItemRepository = cartItemRepository;
+    public void setCartItemService(CartItemService cartItemService) {
+        this.cartItemService = cartItemService;
     }
 
     @Autowired

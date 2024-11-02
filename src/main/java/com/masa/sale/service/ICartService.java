@@ -1,16 +1,19 @@
-package com.masa.sell.service;
+package com.masa.sale.service;
 
-import com.masa.sell.DTO.CartItemDTO;
-import com.masa.sell.model.Cart;
-import com.masa.sell.model.CartItem;
+import com.masa.sale.dto.CartItemDTO;
+import com.masa.sale.model.Cart;
+import com.masa.sale.model.CartItem;
+import jakarta.transaction.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface ICartService {
     Optional<CartItem> addCartItem(CartItemDTO cartItem);
-
-    Optional<Cart> findById(Long profileId);
-    Optional<Cart> updateCartItem(Long profileId, Long itemId, Integer quantity);
+    Cart find(Long profileId);
     Optional<Cart> deleteCartItem(Long profileId, Long itemId);
+    void restoreItems(Set<CartItem> items);
     void clearCart(Long profileId);
+    @Transactional
+    Boolean cartExists(Long profileId);
 }

@@ -1,4 +1,4 @@
-package com.masa.sale.DTO;
+package com.masa.sale.dto;
 
 import lombok.*;
 
