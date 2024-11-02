@@ -4,7 +4,6 @@ import com.masa.sell.DTO.CartDTO;
 import com.masa.sell.DTO.CartItemDTO;
 import com.masa.sell.mapper.CartMapper;
 import com.masa.sell.service.ICartService;
-import com.masa.sell.service.impl.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ public class CartController {
 
     @GetMapping("/{profileId}")
     public ResponseEntity<CartDTO> getCart(@PathVariable Long profileId) {
-        return cartService.getCart(profileId)
+        return cartService.findById(profileId)
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -26,7 +25,7 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity<CartDTO> addCartItem(@RequestBody CartItemDTO cartItemDTO) {
         return cartService.addCartItem(cartItemDTO)
-                .flatMap(cartItem -> cartService.getCart(cartItem.getId().getCartId()))
+                .flatMap(cartItem -> cartService.findById(cartItem.getId().getCartId()))
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());

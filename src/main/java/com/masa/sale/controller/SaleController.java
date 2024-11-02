@@ -8,25 +8,27 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/sell")
-public class SellController {
+public class SaleController {
     private ISaleService saleService;
 
     @PutMapping("/checkout")
     public ResponseEntity<Sale> checkout(@RequestParam Long cartId) {
-        return saleService.createSale(cartId)
+        return saleService.create(cartId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/cancel")
-    public ResponseEntity<Boolean> cancel(@RequestParam Long saleId) {
-        return ResponseEntity.ok(saleService.cancelSale(saleId));
+    public ResponseEntity<Sale> cancel(@RequestParam Long saleId) {
+        return saleService.cancel(saleId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @PostMapping("/confirm")
     public ResponseEntity<Sale> confirm(@RequestParam Long saleId) {
         // TODO: Implement a method to check if the payment was successful
-        return saleService.confirmSale(saleId)
+        return saleService.confirm(saleId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }

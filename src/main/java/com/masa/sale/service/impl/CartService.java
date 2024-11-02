@@ -40,7 +40,7 @@ public class CartService implements ICartService {
             throw new IllegalArgumentException("Quantity is not enough");
         }
 
-        Cart cart = getCart(profileId).orElseGet(() -> createNewCart(profileId));
+        Cart cart = findById(profileId).orElseGet(() -> createNewCart(profileId));
         return findCartItem(cart.getId(), itemId)
                 .map(cartItem1 -> {
                     cartItem1.setQuantity(cartItem1.getQuantity() + quantity);
@@ -64,7 +64,7 @@ public class CartService implements ICartService {
 
     @Override
     @Transactional
-    public Optional<Cart> getCart(Long profileId) {
+    public Optional<Cart> findById(Long profileId) {
         return cartRepository.findById(profileId);
     }
 
@@ -94,7 +94,7 @@ public class CartService implements ICartService {
     @Override
     @Transactional
     public Optional<Cart> updateCartItem(Long profileId, Long itemId, Integer quantity) {
-        Cart cart = getCart(profileId)
+        Cart cart = findById(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found for profile: " + profileId));
 
         CartItem cartItem = findCartItem(cart.getId(), itemId)
@@ -114,7 +114,7 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public Optional<Cart> deleteCartItem(Long profileId, Long itemId) {
-        Cart cart = getCart(profileId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
+        Cart cart = findById(profileId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
         return findCartItem(cart.getId(), itemId)
                 .map(cartItem -> {
                     itemService.updateItem(itemId, cartItem.getQuantity());
@@ -127,7 +127,7 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public void clearCart(Long cartId) {
-        Cart cart = getCart(cartId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
+        Cart cart = findById(cartId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
         cart.getCartItems().forEach(cartItem -> itemService.updateItem(cartItem.getId().getItemId(), cartItem.getQuantity()));
         cartItemRepository.deleteAll(cart.getCartItems());
     }

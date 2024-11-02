@@ -14,14 +14,26 @@ public class ItemService implements IItemService {
     private ItemClient itemClient;
 
     @Override
-    public Optional<ItemDTO> getItem(Long itemId) {
+    public Optional<ItemDTO> findById(Long itemId) {
         return Optional.ofNullable(itemClient.getItem(itemId));
     }
 
     @Override
     public Boolean itemExists(Long itemId) {
-        return getItem(itemId).isPresent();
+        return findById(itemId).isPresent();
     }
+
+    @Override
+    public Optional<ItemDTO> incrementStock(Long itemId, int quantity){
+        try {
+            return Optional.ofNullable(itemClient.updateItem(itemId, quantity));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<ItemDTO> decrementStock(Long itemId, int quantity);
 
     @Override
     public Boolean updateItem(Long itemId, Integer quantity) {

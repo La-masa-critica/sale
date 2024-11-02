@@ -1,7 +1,7 @@
 package com.masa.sell.model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "sale")
@@ -21,8 +21,8 @@ public class Sale{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long profileId;
-    private Timestamp date;
-    private String status;
+    private LocalDateTime date;
+    private SaleStatus status;
     @Column(name = "total", precision = 10, scale = 2)
     private BigDecimal total;
     private String comments;

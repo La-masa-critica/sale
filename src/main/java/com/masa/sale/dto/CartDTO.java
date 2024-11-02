@@ -1,4 +1,4 @@
-package com.masa.sell.DTO;
+package com.masa.sale.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
