@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Builder
 @Accessors(chain = true)
-public class CartItem{
+public class CartItem {
     @Builder.Default
     @EmbeddedId
     private CartItemId id = new CartItemId();
