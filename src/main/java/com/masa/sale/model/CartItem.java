@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 
 @Entity(name = "cart_item")
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Builder
 @Accessors(chain = true)
-public class CartItem {
+public class CartItem implements Serializable {
     @Builder.Default
     @EmbeddedId
     private CartItemId id = new CartItemId();

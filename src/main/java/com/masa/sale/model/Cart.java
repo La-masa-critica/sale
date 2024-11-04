@@ -2,6 +2,7 @@ package com.masa.sale.model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -13,7 +14,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class Cart{
+public class Cart implements Serializable {
     @Id
     private Long id;
     private Boolean enabled;
