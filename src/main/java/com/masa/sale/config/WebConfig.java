@@ -1,4 +1,4 @@
-package com.masa.sell.config;
+package com.masa.sale.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
