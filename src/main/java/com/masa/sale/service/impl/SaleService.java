@@ -55,7 +55,7 @@ public class SaleService implements ISaleService {
     @Transactional
     protected Sale completeSale(Sale sale, Set<CartItem> items) {
         Set<SaleDetails> saleDetails = createSaleDetails(sale, items);
-        items.forEach(cartItem -> cartItemService.delete(cartItem)); // --> No está funcionando.
+        items.forEach(cartItem -> cartItemService.delete(cartItem));
         return sale.toBuilder()
                 .total(calculateTotal(saleDetails))
                 .saleDetails(saleDetails)

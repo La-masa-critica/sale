@@ -1,6 +1,5 @@
 package com.masa.sale.service.impl;
 
-import com.masa.sale.dto.CartItemDTO;
 import com.masa.sale.exeptions.InventoryException;
 import com.masa.sale.model.Cart;
 import com.masa.sale.model.CartItem;
@@ -21,12 +20,12 @@ public class CartService implements ICartService {
 
     @Override
     @Transactional
-    public Optional<CartItem> addCartItem(CartItemDTO cartItemDTO) {
-        validateCartItemDTO(cartItemDTO);
+    public Optional<CartItem> addCartItem(CartItem cartItem) {
+        validateCartItem(cartItem);
 
-        Long profileId = cartItemDTO.getCartId();
-        Long itemId = cartItemDTO.getItemId();
-        Integer quantity = cartItemDTO.getQuantity();
+        Long profileId = cartItem.getCartId();
+        Long itemId = cartItem.getItemId();
+        Integer quantity = cartItem.getQuantity();
         Cart cart = cartExists(profileId) ? find(profileId) : createNewCart(profileId);
 
         return cartItemService.exists(cart.getId(), itemId)
@@ -37,7 +36,6 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public Optional<Cart> deleteCartItem(Long cartId, Long itemId) {
-        // TODO: Fix deleteCartItem method. Actually, it is not working.
         cartItemService.delete(cartId, itemId);
         return Optional.of(find(cartId));
     }
@@ -46,8 +44,17 @@ public class CartService implements ICartService {
     @Override
     @Transactional
     public Cart find(Long profileId) {
-        return cartRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found for profile: " + profileId));
+        if (!profileExists(profileId)) {
+            throw new IllegalArgumentException("Profile does not exist");
+        }
+        return cartRepository.findById(profileId).orElse(createNewCart(profileId));
+    }
+
+    @Transactional
+    @Override
+    public Optional<Cart> findByCartItem(CartItem cartItem){
+        return Optional.ofNullable(cartRepository.findById(cartItem.getCartId())
+                .orElseThrow(() -> new IllegalArgumentException("Cart does not exist")));
     }
 
     @Transactional
@@ -74,14 +81,14 @@ public class CartService implements ICartService {
         return cartRepository.existsById(profileId);
     }
 
-    private void validateCartItemDTO(CartItemDTO cartItemDTO) {
-        if (!profileExists(cartItemDTO.getCartId())) {
+    private void validateCartItem(CartItem cartItem) {
+        if (!profileExists(cartItem.getCartId())) {
             throw new IllegalArgumentException("Profile does not exist");
         }
-        if (cartItemDTO.getQuantity() <= 0) {
+        if (cartItem.getQuantity() <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
-        if (!itemService.itemExists(cartItemDTO.getItemId())) {
+        if (!itemService.itemExists(cartItem.getItemId())) {
             throw new IllegalArgumentException("Item does not exist");
         }
     }

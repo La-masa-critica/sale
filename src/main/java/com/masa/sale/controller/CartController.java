@@ -30,8 +30,8 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity<CartDTO> addCartItem(@RequestBody CartItemDTO cartItemDTO) {
-        return cartService.addCartItem(cartItemDTO)
-                .flatMap(cartItem -> Optional.ofNullable(cartService.find(cartItem.getId().getCartId())))
+        return cartService.addCartItem(cartItemMapper.toEntity(cartItemDTO))
+                .flatMap(cartService::findByCartItem)
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
@@ -43,6 +43,13 @@ public class CartController {
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<Void> clearCart(@RequestParam Long profileId) {
+        cartService.clearCart(profileId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/update")
