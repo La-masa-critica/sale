@@ -101,10 +101,6 @@ public class SaleService implements ISaleService {
     }
 
     private Optional<Sale> transition(Sale sale, SaleStatus status) {
-        System.out.println("SaleService.transition");
-        if (!sale.getStatus().canTransitionTo(status)) {
-            System.out.println("Status can't transition to " + status);
-        }
         return Optional.of(sale)
                 .filter(s -> s.getStatus().canTransitionTo(status))
                 .map(s -> s.toBuilder().status(status).build())
@@ -143,13 +139,11 @@ public class SaleService implements ISaleService {
     @Transactional
     @Override
     public Optional<Sale> confirm(Long saleId) {
-        System.out.println("SaleService.confirm");
         Sale sale = find(saleId).orElseThrow(() -> new RuntimeException("Sale not found with id: " + saleId));
         return Optional.of(executeConfirmation(sale));
     }
 
     private Sale executeConfirmation(Sale sale) {
-        System.out.println("SaleService.executeConfirmation");
         return transition(sale, SaleStatus.COMPLETED)
                 .orElseThrow(() -> new SaleProcessingException("Failed to confirm sale: " + sale.getId()));
     }

@@ -27,9 +27,6 @@ public class CartService implements ICartService {
         Long profileId = cartItemDTO.getCartId();
         Long itemId = cartItemDTO.getItemId();
         Integer quantity = cartItemDTO.getQuantity();
-        System.out.println("profileId: " + profileId);
-        System.out.println("itemId: " + itemId);
-        System.out.println("quantity: " + quantity);
         Cart cart = cartExists(profileId) ? find(profileId) : createNewCart(profileId);
 
         return cartItemService.exists(cart.getId(), itemId)
