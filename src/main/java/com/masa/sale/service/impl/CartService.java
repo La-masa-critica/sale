@@ -50,7 +50,7 @@ public class CartService implements ICartService {
         if (!profileExists(profileId)) {
             throw new IllegalArgumentException("Profile does not exist");
         }
-        return cartRepository.findById(profileId).orElseThrow(() -> new IllegalArgumentException("Cart does not exist"));
+        return cartRepository.findById(profileId).orElseGet(() -> createNewCart(profileId));
     }
 
     @Transactional
