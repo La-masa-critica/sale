@@ -42,8 +42,8 @@ public class SaleController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
-    @GetMapping("/profile/{profileId}")
-    public ResponseEntity<List<Sale>> getSalesByProfileId(@PathVariable Long profileId) {
+    @GetMapping()
+    public ResponseEntity<List<Sale>> getSalesByProfileId(@RequestParam Long profileId) {
         return ResponseEntity.ok(saleService.findAllByProfileId(profileId));
     }
 
