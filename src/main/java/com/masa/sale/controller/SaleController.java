@@ -1,6 +1,7 @@
 package com.masa.sale.controller;
 
 import com.masa.sale.dto.FacturaDTO;
+import com.masa.sale.model.Cart;
 import com.masa.sale.model.Sale;
 import com.masa.sale.service.ISaleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,13 @@ public class SaleController {
     public ResponseEntity<Sale> confirm(@RequestParam Long saleId) {
         // TODO: Implement a method to check if the payment was successful
         return saleService.confirm(saleId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
+    }
+
+    @PutMapping("/fail")
+    public ResponseEntity<Cart> fail(@RequestParam Long saleId) {
+        return saleService.failSale(saleId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }
