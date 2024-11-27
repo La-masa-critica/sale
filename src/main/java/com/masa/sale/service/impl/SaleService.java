@@ -77,15 +77,15 @@ public class SaleService implements ISaleService {
     }
 
     private SaleDetails createSaleDetail(Sale sale, CartItem item) {
-        BigDecimal price = itemService.findById(item.getItemId())
-                .map(ItemDTO::getPrice)
+        ItemDTO itemDTO = itemService.findById(item.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + item.getItemId()));
 
         return SaleDetails.builder()
                 .itemId(item.getItemId())
+                .itemName(itemDTO.getName())
                 .sale(sale)
                 .quantity(item.getQuantity())
-                .price(price)
+                .price(itemDTO.getPrice())
                 .build();
     }
 
@@ -120,9 +120,24 @@ public class SaleService implements ISaleService {
         return executeCancellation(sale);
     }
 
+    @Transactional
+    @Override
+    public Optional<Cart> failSale(Long saleId) {
+        Sale sale = find(saleId).orElseThrow(() -> new ResourceNotFoundException("Sale not found with id: " + saleId));
+        return executeFailure(sale)
+                .flatMap(cartService::restoreCart);
+    }
+
     private Optional<Sale> executeCancellation(Sale sale) {
         transition(sale, SaleStatus.CANCELLED)
                 .orElseThrow(() -> new SaleProcessingException("Failed to cancel sale: " + sale.getId()));
+        restoreItems(sale);
+        return Optional.of(sale);
+    }
+
+    private Optional<Sale> executeFailure(Sale sale) {
+        transition(sale, SaleStatus.FAILED)
+                .orElseThrow(() -> new SaleProcessingException("Failed to fail sale: " + sale.getId()));
         restoreItems(sale);
         return Optional.of(sale);
     }

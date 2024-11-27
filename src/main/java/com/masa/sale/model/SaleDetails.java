@@ -20,6 +20,10 @@ public class SaleDetails {
     @Column(name = "item_id", nullable = false)
     private Long itemId;
 
+    @Column(name = "item_name", nullable = false)
+    private String itemName;
+
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
     @Column(name = "price", precision = 10, scale = 2)

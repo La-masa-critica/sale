@@ -45,7 +45,6 @@ public class CartController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-
     @DeleteMapping("/clear")
     public ResponseEntity<Void> clearCart(@RequestParam Long profileId) {
         cartService.clearCart(profileId);

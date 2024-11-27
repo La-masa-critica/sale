@@ -3,6 +3,7 @@ package com.masa.sale.service.impl;
 import com.masa.sale.exeptions.InventoryException;
 import com.masa.sale.model.Cart;
 import com.masa.sale.model.CartItem;
+import com.masa.sale.model.Sale;
 import com.masa.sale.repository.CartRepository;
 import com.masa.sale.service.ICartService;
 import jakarta.transaction.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService implements ICartService {
@@ -77,6 +79,27 @@ public class CartService implements ICartService {
                 itemService.incrementStock(item.getItemId(), item.getQuantity())
                         .orElseThrow(() -> new InventoryException("Failed to restore item: " + item.getItemId()))
         );
+    }
+
+    @Override
+    @Transactional
+    public Optional<Cart> restoreCart(Sale sale) {
+        System.out.println("CartService.restoreCartItems");
+        Set<CartItem> cartItems = sale.getSaleDetails().stream()
+                .map(saleDetails -> CartItem.builder()
+                        .cartId(sale.getProfileId())
+                        .itemId(saleDetails.getItemId())
+                        .quantity(saleDetails.getQuantity())
+                        .build()
+                )
+                .flatMap(cartItem -> this.addCartItem(cartItem).stream())
+                .collect(Collectors.toUnmodifiableSet());
+        return Optional.of(cartRepository.save(Cart.builder()
+                .id(sale.getProfileId())
+                .cartItems(cartItems)
+                .enabled(true)
+                .build()
+        ));
     }
 
     @Transactional
