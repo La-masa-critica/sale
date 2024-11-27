@@ -15,19 +15,19 @@ public interface FacturaMapper {
     FacturaMapper INSTANCE = Mappers.getMapper(FacturaMapper.class);
 
     // Mapeo de FacturaExterna a FacturaDTO
-    @Mapping(source = "numeroFactura", target = "id")
+    @Mapping(source = "numero_factura", target = "id")
     @Mapping(source = "fecha", target = "date")
-    @Mapping(source = "clienteNombre", target = "customer.name")
+    @Mapping(source = "cliente_nombre", target = "customer.name")
+    @Mapping(source = "cliente_documento", target = "customer.id")
     @Mapping(source = "detalles", target = "items")
     @Mapping(source = "total", target = "total")
-    @Mapping(target = "status", constant = "Done")  // Asigna "Done" como valor constante para status
-
+    @Mapping(target = "status", constant = "COMPLETED")  // Asigna "Done" como valor constante para status
     FacturaDTO facturaExternaToFacturaDTO(FacturaExterna facturaExterna);
 
     // Mapeo de DetalleExterno a ExtItemDTO
-    @Mapping(source = "productoId", target = "id")
-    @Mapping(source = "productoNombre", target = "name")
-    @Mapping(source = "precioUnitario", target = "price")
+    @Mapping(source = "producto_id", target = "id")
+    @Mapping(source = "producto_nombre", target = "name")
+    @Mapping(source = "precio_unitario", target = "price")
     @Mapping(source = "cantidad", target = "quantity")
     ExtItemDTO detalleExternoToExtItemDTO(DetalleExterno detalleExterno);
 

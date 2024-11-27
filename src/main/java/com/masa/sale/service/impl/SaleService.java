@@ -41,15 +41,13 @@ public class SaleService implements ISaleService {
 
     @Override
     public List<FacturaDTO> obtenerFactura() {
-        List<String> ids = this.facturaExternaClient.obtenerFacturas("facturas", "2024-11-01", "2024-11-30", "Sucursal Fromages");
+        List<FacturasTot> ids = this.facturaExternaClient.obtenerFacturas("facturas", "2024-11-01", "2024-11-30", "1");
         List<FacturaExterna> listaFacturas= new ArrayList<>();
 
-        for (String id : ids) {
-            listaFacturas.add(this.facturaExternaClient.getFacturaDetalle(id));
+        for (FacturasTot facturaTot : ids) {
+            listaFacturas.add(this.facturaExternaClient.getFacturaDetalle(facturaTot.getNumero_factura()));
         }
-        return listaFacturas.stream().peek(factura -> factura.getDetalles().forEach(detalle ->
-                detalle.setPrecioUnitario(convertirPrecio(detalle.getPrecioUnitario())))) // Convertir precio unitario
-                .map(FacturaMapper.INSTANCE::facturaExternaToFacturaDTO)
+        return listaFacturas.stream().map(FacturaMapper.INSTANCE::facturaExternaToFacturaDTO)
                 .collect(Collectors.toList());
 
     }

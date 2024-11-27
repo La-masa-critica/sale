@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ExtItemDTO {
     private Long id;
     private String name;
-    private Double price;
+    private String price;
     private Integer quantity;
 }

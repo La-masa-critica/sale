@@ -13,11 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 public class FacturaExterna {
 
-    private Integer numeroFactura;
+    private Integer numero_factura;
     private String fecha;
-    private String vendedorNombre;
-    private String clienteNombre;
-    private String clienteDocumento;
+    private String vendedor_nombre;
+    private String cliente_nombre;
+    private String cliente_documento;
     private List<DetalleExterno> detalles;
     private String total;
 

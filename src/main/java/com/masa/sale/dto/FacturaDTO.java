@@ -12,10 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FacturaDTO {
-    private Long id;
+    private Integer id;
     private String date;
     private String status;
-    private Double total;
+    private String total;
     private String comments;
     private CustomerDTO customer;
     private List<ExtItemDTO> items;

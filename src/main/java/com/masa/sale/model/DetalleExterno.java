@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleExterno {
-    private String productoId;
-    private String productoNombre;
+    private String producto_id;
+    private String producto_nombre;
     private Integer cantidad;
-    private String precioUnitario;
-    private String precioTotal;
+    private String precio_unitario;
+    private String precio_total;
 }
