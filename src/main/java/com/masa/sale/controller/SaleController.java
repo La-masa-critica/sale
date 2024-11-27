@@ -1,5 +1,6 @@
 package com.masa.sale.controller;
 
+import com.masa.sale.dto.FacturaDTO;
 import com.masa.sale.model.Sale;
 import com.masa.sale.service.ISaleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class SaleController {
         return saleService.confirm(saleId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<FacturaDTO>> getSummary() {
+        return ResponseEntity.ok(this.saleService.obtenerFactura());
     }
 
     @GetMapping()
