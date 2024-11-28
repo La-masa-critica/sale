@@ -6,7 +6,7 @@ import com.masa.sale.model.CartItemId;
 import com.masa.sale.repository.CartItemRepository;
 import com.masa.sale.service.ICartItemService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +14,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class CartItemService implements ICartItemService {
-    private CartItemRepository cartItemRepository;
+    private final CartItemRepository cartItemRepository;
 
     @Override
     public Optional<CartItem> findById(Long cartId, Long itemId) {
@@ -97,10 +98,5 @@ public class CartItemService implements ICartItemService {
     private CartItem saveCartItem(CartItem cartItem) {
         System.out.println("cartItem = " + cartItem);
         return cartItemRepository.save(cartItem);
-    }
-
-    @Autowired
-    public void setCartItemRepository(CartItemRepository cartItemRepository) {
-        this.cartItemRepository = cartItemRepository;
     }
 }

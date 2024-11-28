@@ -27,5 +27,4 @@ public class Cart implements Serializable {
             fetch = FetchType.EAGER
     )
     private Set<CartItem> cartItems = new HashSet<>();
-
 }

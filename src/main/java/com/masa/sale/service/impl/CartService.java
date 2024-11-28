@@ -7,7 +7,7 @@ import com.masa.sale.model.Sale;
 import com.masa.sale.repository.CartRepository;
 import com.masa.sale.service.ICartService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,10 +15,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CartService implements ICartService {
-    private CartRepository cartRepository;
-    private CartItemService cartItemService;
-    private ItemService itemService;
+    private final CartRepository cartRepository;
+    private final CartItemService cartItemService;
+    private final ItemService itemService;
 
     @Override
     @Transactional
@@ -142,20 +143,5 @@ public class CartService implements ICartService {
         System.out.println("CartService.profileExists");
         //TODO: Call  profile service to check if profile exists
         return true;
-    }
-
-    @Autowired
-    public void setCartRepository(CartRepository cartRepository) {
-        this.cartRepository = cartRepository;
-    }
-
-    @Autowired
-    public void setCartItemService(CartItemService cartItemService) {
-        this.cartItemService = cartItemService;
-    }
-
-    @Autowired
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
     }
 }

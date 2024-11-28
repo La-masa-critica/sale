@@ -5,16 +5,16 @@ import com.masa.sale.client.ItemClient;
 import com.masa.sale.exeptions.InventoryException;
 import com.masa.sale.model.CartItem;
 import com.masa.sale.service.IItemService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class ItemService implements IItemService {
-    private ItemClient itemClient;
+    private final ItemClient itemClient;
 
     @Override
     public Optional<ItemDTO> findById(Long itemId) {
@@ -44,12 +44,6 @@ public class ItemService implements IItemService {
                         .orElseThrow(() -> new InventoryException("Failed to restore item: " + item.getItemId()))
         );
     }
-
-    @Autowired
-    public void setItemClient(@Qualifier("com.masa.sale.client.ItemClient") ItemClient itemClient) {
-        this.itemClient = itemClient;
-    }
-
 }
 
 

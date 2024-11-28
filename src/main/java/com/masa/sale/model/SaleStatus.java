@@ -34,7 +34,7 @@ public enum SaleStatus {
         }
 
         return switch (this) {
-            case PENDING -> newStatus == COMPLETED || newStatus == CANCELLED; // --> Remove when the buy process is implemented.
+            case PENDING -> newStatus == COMPLETED || newStatus == CANCELLED  || newStatus == FAILED; // --> Remove when the buy process is implemented.
             //case PENDING -> newStatus == PROCESSING || newStatus == CANCELLED; // --> Add when the buy process is implemented.
             //case PROCESSING -> newStatus == COMPLETED || newStatus == FAILED; // --> Add when the buy process is implemented.
             default -> false;

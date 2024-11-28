@@ -9,7 +9,7 @@ import com.masa.sale.repository.SaleDetailsRepository;
 import com.masa.sale.repository.SaleRepository;
 import com.masa.sale.service.ISaleService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,12 +20,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class SaleService implements ISaleService {
-    private SaleRepository saleRepository;
-    private CartService cartService;
-    private CartItemService cartItemService;
-    private SaleDetailsRepository saleDetailsRepository;
-    private ItemService itemService;
+    private final SaleRepository saleRepository;
+    private final CartService cartService;
+    private final CartItemService cartItemService;
+    private final SaleDetailsRepository saleDetailsRepository;
+    private final ItemService itemService;
 
     @Transactional
     @Override
@@ -55,7 +56,7 @@ public class SaleService implements ISaleService {
     @Transactional
     protected Sale completeSale(Sale sale, Set<CartItem> items) {
         Set<SaleDetails> saleDetails = createSaleDetails(sale, items);
-        items.forEach(cartItem -> cartItemService.delete(cartItem));
+        items.forEach(cartItemService::delete);
         return sale.toBuilder()
                 .total(calculateTotal(saleDetails))
                 .saleDetails(saleDetails)
@@ -161,30 +162,5 @@ public class SaleService implements ISaleService {
     private Sale executeConfirmation(Sale sale) {
         return transition(sale, SaleStatus.COMPLETED)
                 .orElseThrow(() -> new SaleProcessingException("Failed to confirm sale: " + sale.getId()));
-    }
-
-    @Autowired
-    public void setCartItemService(CartItemService cartItemService) {
-        this.cartItemService = cartItemService;
-    }
-
-    @Autowired
-    public void setSaleRepository(SaleRepository saleRepository) {
-        this.saleRepository = saleRepository;
-    }
-
-    @Autowired
-    public void setCartService(CartService cartService) {
-        this.cartService = cartService;
-    }
-
-    @Autowired
-    public void setSaleDetailsRepository(SaleDetailsRepository saleDetailsRepository) {
-        this.saleDetailsRepository = saleDetailsRepository;
-    }
-
-    @Autowired
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
     }
 }

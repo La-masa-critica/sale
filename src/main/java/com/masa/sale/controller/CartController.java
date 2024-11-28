@@ -6,6 +6,7 @@ import com.masa.sale.mapper.CartItemMapper;
 import com.masa.sale.mapper.CartMapper;
 import com.masa.sale.service.ICartItemService;
 import com.masa.sale.service.ICartService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/cart")
+@AllArgsConstructor
 public class CartController {
-    private ICartService cartService;
-    private CartMapper cartMapper;
-    private ICartItemService cartItemService;
-    private CartItemMapper cartItemMapper;
+    private final ICartService cartService;
+    private final CartMapper cartMapper;
+    private final ICartItemService cartItemService;
+    private final CartItemMapper cartItemMapper;
 
     @GetMapping("/{profileId}")
     public ResponseEntity<CartDTO> getCart(@PathVariable Long profileId) {
@@ -57,25 +59,5 @@ public class CartController {
                 .map(cartItemMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Autowired
-    public void setICartItemService(ICartItemService cartItemService) {
-        this.cartItemService = cartItemService;
-    }
-
-    @Autowired
-    public void setCartService(ICartService cartService) {
-        this.cartService = cartService;
-    }
-
-    @Autowired
-    public void setCartMapper(CartMapper cartMapper) {
-        this.cartMapper = cartMapper;
-    }
-
-    @Autowired
-    public void setCartItemMapper(CartItemMapper cartItemMapper) {
-        this.cartItemMapper = cartItemMapper;
     }
 }

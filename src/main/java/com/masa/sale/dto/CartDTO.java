@@ -15,5 +15,4 @@ public class CartDTO {
     private Long id;
     private Boolean enabled;
     private Set<CartItemDTO> items;
-
 }

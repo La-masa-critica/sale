@@ -3,7 +3,7 @@ package com.masa.sale.controller;
 import com.masa.sale.model.Cart;
 import com.masa.sale.model.Sale;
 import com.masa.sale.service.ISaleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/sale")
+@AllArgsConstructor
 public class SaleController {
     private ISaleService saleService;
 
@@ -53,10 +54,5 @@ public class SaleController {
     @GetMapping()
     public ResponseEntity<List<Sale>> getSalesByProfileId(@RequestParam Long profileId) {
         return ResponseEntity.ok(saleService.findAllByProfileId(profileId));
-    }
-
-    @Autowired
-    public void setSaleService(ISaleService saleService) {
-        this.saleService = saleService;
     }
 }
