@@ -1,5 +1,6 @@
 package com.masa.sale.controller;
 
+import com.masa.sale.dto.FacturaDTO;
 import com.masa.sale.model.Cart;
 import com.masa.sale.model.Sale;
 import com.masa.sale.service.ISaleService;
@@ -49,6 +50,11 @@ public class SaleController {
         return saleService.failSale(saleId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<FacturaDTO>> getSummary() {
+        return ResponseEntity.ok(this.saleService.obtenerFactura());
     }
 
     @GetMapping()

@@ -1,9 +1,12 @@
 package com.masa.sale.service.impl;
 
+import com.masa.sale.client.IFacturaExterna;
+import com.masa.sale.dto.FacturaDTO;
 import com.masa.sale.dto.ItemDTO;
 import com.masa.sale.exeptions.InventoryException;
 import com.masa.sale.exeptions.ResourceNotFoundException;
 import com.masa.sale.exeptions.SaleProcessingException;
+import com.masa.sale.mapper.FacturaMapper;
 import com.masa.sale.model.*;
 import com.masa.sale.repository.SaleDetailsRepository;
 import com.masa.sale.repository.SaleRepository;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +31,7 @@ public class SaleService implements ISaleService {
     private final CartItemService cartItemService;
     private final SaleDetailsRepository saleDetailsRepository;
     private final ItemService itemService;
+    private final IFacturaExterna facturaExternaClient;
 
     @Transactional
     @Override
@@ -34,6 +39,29 @@ public class SaleService implements ISaleService {
         return Optional.ofNullable(cartService.find(cartId))
                 .map(this::processCartToSale);
     }
+
+    @Override
+    public List<FacturaDTO> obtenerFactura() {
+        List<FacturasTot> ids = this.facturaExternaClient.obtenerFacturas("facturas", "2024-11-01", "2024-11-30", "1");
+        List<FacturaExterna> listaFacturas= new ArrayList<>();
+
+        for (FacturasTot facturaTot : ids) {
+            listaFacturas.add(this.facturaExternaClient.getFacturaDetalle(facturaTot.getNumero_factura()));
+        }
+        return listaFacturas.stream().map(FacturaMapper.INSTANCE::facturaExternaToFacturaDTO)
+                .collect(Collectors.toList());
+
+    }
+
+
+    private String convertirPrecio(String precio) {
+        try {
+            return String.valueOf(Double.parseDouble(precio)); // Convierte el String a Double y vuelve a String si se requiere
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Error al convertir el precio unitario a Double: " + precio, e);
+        }
+    }
+
 
     @Transactional
     protected Sale processCartToSale(Cart cart) {
