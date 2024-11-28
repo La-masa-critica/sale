@@ -31,6 +31,6 @@ public interface FacturaMapper {
     @Mapping(source = "cantidad", target = "quantity")
     ExtItemDTO detalleExternoToExtItemDTO(DetalleExterno detalleExterno);
 
-    // Método para convertir una lista de DetalleExterno a lista de ExtItemDTO
+    // Metodo para convertir una lista de DetalleExterno a lista de ExtItemDTO
     List<ExtItemDTO> detalleExternosToExtItemDTOs(List<DetalleExterno> detallesExterno);
 }

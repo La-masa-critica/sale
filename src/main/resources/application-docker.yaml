@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    # show-sql: true
     open-in-view: false
     properties:
       hibernate:
@@ -27,6 +27,20 @@ spring:
     loadbalancer:
       enabled: true
 
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        cloud:
+          netflix:
+            eureka:
+              DiscoveryClient: 'OFF'
+    com:
+      netflix:
+        eureka: 'OFF'
+    org.springframework.cloud: 'WARN'
+
 eureka:
   client:
     service-url:
@@ -36,3 +50,7 @@ eureka:
 
 server:
   port: 8081
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024

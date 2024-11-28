@@ -23,14 +23,11 @@ public class CartService implements ICartService {
 
     @Override
     @Transactional
-    public Optional<CartItem> addCartItem(CartItem cartItem) {
-        System.out.println("CartService.addCartItem");
+    public Optional<CartItem> addCartItem(CartItem cartItem, Long cartId) {
         validateCartItem(cartItem);
-        Long profileId = cartItem.getCartId();
         Long itemId = cartItem.getItemId();
         Integer quantity = cartItem.getQuantity();
-        Cart cart = cartExists(profileId) ? find(profileId) : createNewCart(profileId);
-        System.out.println("cart item exists" + cartItemService.exists(cart.getId(), itemId));
+        Cart cart = cartExists(cartId) ? find(cartId) : createNewCart(cartId);
 
         return cartItemService.exists(cart.getId(), itemId)
                 ? cartItemService.addQuantity(cart.getId(), itemId, quantity)
@@ -40,7 +37,6 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public Optional<Cart> deleteCartItem(Long cartId, Long itemId) {
-        System.out.println("CartService.deleteCartItem");
         cartItemService.delete(cartId, itemId);
         return Optional.of(find(cartId));
     }
@@ -49,7 +45,6 @@ public class CartService implements ICartService {
     @Override
     @Transactional
     public Cart find(Long profileId) {
-        System.out.println("CartService.find");
         if (!profileExists(profileId)) {
             throw new IllegalArgumentException("Profile does not exist");
         }
@@ -59,7 +54,6 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public Optional<Cart> findByCartItem(CartItem cartItem){
-        System.out.println("CartService.findByCartItem");
         if (cartItem.getId().getCartId() == null) {
             throw new IllegalArgumentException("Cart does not exist");
         }
@@ -69,13 +63,11 @@ public class CartService implements ICartService {
 
     @Transactional
     public Set<CartItem> getCartItems(Long cartId){
-        System.out.println("CartService.getCartItems");
         return find(cartId).getCartItems();
     }
 
     @Override
     public void restoreItems(Set<CartItem> items) {
-        System.out.println("CartService.restoreItems");
         items.forEach(item ->
                 itemService.incrementStock(item.getItemId(), item.getQuantity())
                         .orElseThrow(() -> new InventoryException("Failed to restore item: " + item.getItemId()))
@@ -85,15 +77,13 @@ public class CartService implements ICartService {
     @Override
     @Transactional
     public Optional<Cart> restoreCart(Sale sale) {
-        System.out.println("CartService.restoreCartItems");
         Set<CartItem> cartItems = sale.getSaleDetails().stream()
                 .map(saleDetails -> CartItem.builder()
-                        .cartId(sale.getProfileId())
                         .itemId(saleDetails.getItemId())
                         .quantity(saleDetails.getQuantity())
                         .build()
                 )
-                .flatMap(cartItem -> this.addCartItem(cartItem).stream())
+                .flatMap(cartItem -> this.addCartItem(cartItem, sale.getProfileId()).stream())
                 .collect(Collectors.toUnmodifiableSet());
         return Optional.of(cartRepository.save(Cart.builder()
                 .id(sale.getProfileId())
@@ -106,18 +96,15 @@ public class CartService implements ICartService {
     @Transactional
     @Override
     public void clearCart(Long cartId) {
-        System.out.println("CartService.clearCart");
         cartItemService.findByCartId(cartId).forEach(cartItemService::delete);
     }
 
     @Override
     public Boolean cartExists(Long profileId) {
-        System.out.println("CartService.cartExists");
         return cartRepository.existsById(profileId);
     }
 
     private void validateCartItem(CartItem cartItem) {
-        System.out.println("CartService.validateCartItem");
         if (!profileExists(cartItem.getCartId())) {
             throw new IllegalArgumentException("Profile does not exist");
         }
@@ -130,7 +117,6 @@ public class CartService implements ICartService {
     }
 
     private Cart createNewCart(Long profileId) {
-        System.out.println("CartService.createNewCart");
         return cartRepository.save(
                 Cart.builder()
                         .id(profileId)
@@ -140,8 +126,6 @@ public class CartService implements ICartService {
     }
 
     private Boolean profileExists(Long profileId) {
-        System.out.println("CartService.profileExists");
-        //TODO: Call  profile service to check if profile exists
         return true;
     }
 }

@@ -1,6 +1,5 @@
 package com.masa.sale.client;
 
-import com.masa.sale.dto.FacturaDTO;
 import com.masa.sale.model.FacturaExterna;
 import com.masa.sale.model.FacturasTot;
 import org.springframework.cloud.openfeign.FeignClient;

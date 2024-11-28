@@ -24,7 +24,7 @@ public class SaleController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<Sale> checkout(@RequestParam Long cartId) {
+    public ResponseEntity<Sale> checkout(@RequestHeader("X-User-ID") Long cartId) {
         return saleService.create(cartId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
@@ -58,7 +58,7 @@ public class SaleController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Sale>> getSalesByProfileId(@RequestParam Long profileId) {
+    public ResponseEntity<List<Sale>> getSalesByProfileId(@RequestHeader("X-User-ID") Long profileId) {
         return ResponseEntity.ok(saleService.findAllByProfileId(profileId));
     }
 }

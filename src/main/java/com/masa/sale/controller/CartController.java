@@ -22,17 +22,22 @@ public class CartController {
     private final ICartItemService cartItemService;
     private final CartItemMapper cartItemMapper;
 
-    @GetMapping("/{profileId}")
-    public ResponseEntity<CartDTO> getCart(@PathVariable Long profileId) {
-        return Optional.ofNullable(cartService.find(profileId))
+    @GetMapping()
+    public ResponseEntity<CartDTO> getCart(
+            @RequestHeader("X-User-ID") Long cartId
+    ) {
+        return Optional.ofNullable(cartService.find(cartId))
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CartDTO> addCartItem(@RequestBody CartItemDTO cartItemDTO) {
-        return cartService.addCartItem(cartItemMapper.toEntity(cartItemDTO))
+    public ResponseEntity<CartDTO> addCartItem(
+            @RequestHeader("X-User-ID") Long profileId,
+            @RequestBody CartItemDTO cartItemDTO
+    ) {
+        return cartService.addCartItem(cartItemMapper.toEntity(cartItemDTO), profileId)
                 .flatMap(cartService::findByCartItem)
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
@@ -40,7 +45,10 @@ public class CartController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<CartDTO> deleteCartItem(@RequestParam Long profileId, @RequestParam Long itemId) {
+    public ResponseEntity<CartDTO> deleteCartItem(
+            @RequestHeader("X-User-ID") Long profileId,
+            @RequestParam Long itemId
+    ) {
         return cartService.deleteCartItem(profileId, itemId)
                 .map(cartMapper::toDTO)
                 .map(ResponseEntity::ok)
@@ -48,13 +56,19 @@ public class CartController {
     }
 
     @DeleteMapping("/clear")
-    public ResponseEntity<Void> clearCart(@RequestParam Long profileId) {
+    public ResponseEntity<Void> clearCart(
+            @RequestHeader("X-User-ID") Long profileId
+    ) {
         cartService.clearCart(profileId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/update")
-    public ResponseEntity<CartItemDTO> updateCartItemQuantity(@RequestParam Long profileId, @RequestParam Long itemId, @RequestParam Integer quantity) {
+    public ResponseEntity<CartItemDTO> updateCartItemQuantity(
+            @RequestHeader("X-User-ID") Long profileId,
+            @RequestParam Long itemId,
+            @RequestParam Integer quantity
+    ) {
         return cartItemService.updateCartItemQuantity(profileId, itemId, quantity)
                 .map(cartItemMapper::toDTO)
                 .map(ResponseEntity::ok)

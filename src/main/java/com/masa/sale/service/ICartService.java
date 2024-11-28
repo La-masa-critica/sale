@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ICartService {
-    Optional<CartItem> addCartItem(CartItem cartItem);
+    Optional<CartItem> addCartItem(CartItem cartItem, Long cartId);
     Cart find(Long profileId);
     Optional<Cart> deleteCartItem(Long profileId, Long itemId);
 
